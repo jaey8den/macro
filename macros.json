@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "macros": [
+    {
+      "id": "4ec0542be55a4d738f3ef4185960db4b",
+      "name": "flower",
+      "hotkey": "<f4>",
+      "loop": true,
+      "keys": [
+        {
+          "type": "key",
+          "action": "press",
+          "key": "s",
+          "button": "",
+          "x": 0,
+          "y": 0,
+          "delay_after": 20.0
+        },
+        {
+          "type": "key",
+          "action": "release",
+          "key": "s",
+          "button": "",
+          "x": 0,
+          "y": 0,
+          "delay_after": 0.5
+        },
+        {
+          "type": "key",
+          "action": "press",
+          "key": "d",
+          "button": "",
+          "x": 0,
+          "y": 0,
+          "delay_after": 20.0
+        },
+        {
+          "type": "key",
+          "action": "release",
+          "key": "d",
+          "button": "",
+          "x": 0,
+          "y": 0,
+          "delay_after": 0.5
+        }
+      ]
+    },
+    {
+      "id": "08636160e0164ce4b35226985753e264",
+      "name": "lc",
+      "hotkey": "mouse:x2",
+      "loop": true,
+      "keys": [
+        {
+          "type": "click",
+          "action": "press",
+          "key": "",
+          "button": "left",
+          "x": 712,
+          "y": 542,
+          "delay_after": 0.1
+        }
+      ]
+    }
+  ]
+}
