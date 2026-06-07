@@ -237,17 +237,22 @@ class EditorDialog:
     def _action_label(mk: MacroKey) -> str:
         arrow = _DOWN if mk.action == "press" else _UP
         if mk.type == "click":
-            return f"{arrow} {mk.button}-click ({mk.x}, {mk.y})"
+            indicator = (" [snap]" if mk.use_position else " [free]") if mk.action == "press" else ""
+            return f"{arrow} {mk.button}-click ({mk.x}, {mk.y}){indicator}"
         return f"{arrow} {mk.key}"
 
     def _populate_table(self, keys: list[MacroKey]) -> None:
         for item in self._tree.get_children():
             self._tree.delete(item)
         for i, mk in enumerate(keys, 1):
+            if mk.type == "click" and mk.action == "press":
+                tags = (mk.type, mk.action, str(int(mk.use_position)))
+            else:
+                tags = (mk.type, mk.action)
             self._tree.insert(
                 "", tk.END,
                 values=(i, self._action_label(mk), f"{mk.delay_after:.4f}"),
-                tags=(mk.type, mk.action),
+                tags=tags,
             )
 
     def _renumber(self) -> None:
@@ -269,12 +274,15 @@ class EditorDialog:
                 # Strip leading arrow + space: "↓ a" -> "a", "↑ left-click (x, y)" -> "left-click (x, y)"
                 raw = label[2:]
                 if kind == "click":
-                    # "left-click (100, 200)" -> button="left", x=100, y=200
+                    # "left-click (100, 200) [snap]" -> button="left", x=100, y=200
                     btn_part, coord_part = raw.split("-click ")
                     btn = btn_part.strip()
+                    if " [" in coord_part:
+                        coord_part = coord_part[:coord_part.index(" [")]
                     coord_part = coord_part.strip("()")
                     cx, cy = (int(v.strip()) for v in coord_part.split(","))
-                    keys.append(MacroKey(type="click", action=action, button=btn, x=cx, y=cy, delay_after=delay))
+                    use_pos = tags[2] == "1" if len(tags) > 2 else True
+                    keys.append(MacroKey(type="click", action=action, button=btn, x=cx, y=cy, delay_after=delay, use_position=use_pos))
                 else:
                     keys.append(MacroKey(type="key", action=action, key=raw, delay_after=delay))
             except (ValueError, IndexError):
@@ -315,13 +323,36 @@ class EditorDialog:
             return
         col = self._tree.identify_column(event.x)
         col_idx = int(col[1:]) - 1
-        # Only the delay column (index 2) is editable; index and action are not
-        if col_idx != 2:
-            return
         item = self._tree.identify_row(event.y)
         if not item:
             return
+        if col_idx == 1:
+            tags = self._tree.item(item, "tags")
+            if len(tags) >= 2 and tags[0] == "click" and tags[1] == "press":
+                self._toggle_use_position(item)
+                return
+        if col_idx != 2:
+            return
         self._start_cell_edit(item, col_idx)
+
+    def _toggle_use_position(self, item: str) -> None:
+        tags = list(self._tree.item(item, "tags"))
+        use_pos = not (tags[2] == "1" if len(tags) > 2 else True)
+        if len(tags) > 2:
+            tags[2] = str(int(use_pos))
+        else:
+            tags.append(str(int(use_pos)))
+        vals = list(self._tree.item(item, "values"))
+        label: str = vals[1]
+        raw = label[2:]  # strip arrow prefix
+        btn_part, rest = raw.split("-click ")
+        btn = btn_part.strip()
+        if " [" in rest:
+            rest = rest[:rest.index(" [")]
+        coords = rest.strip()
+        indicator = " [snap]" if use_pos else " [free]"
+        vals[1] = f"{_DOWN} {btn}-click {coords}{indicator}"
+        self._tree.item(item, values=vals, tags=tuple(tags))
 
     def _start_cell_edit(self, item: str, col_idx: int) -> None:
         if self._cell_editor:

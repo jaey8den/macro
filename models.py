@@ -11,6 +11,7 @@ class MacroKey:
     x: int = 0              # screen x for click actions
     y: int = 0              # screen y for click actions
     delay_after: float = 0.02  # seconds to wait after this action
+    use_position: bool = True  # if True, teleport cursor to (x, y) before pressing
 
     def to_dict(self) -> dict:
         return {
@@ -21,6 +22,7 @@ class MacroKey:
             "x": self.x,
             "y": self.y,
             "delay_after": self.delay_after,
+            "use_position": self.use_position,
         }
 
     @classmethod
@@ -33,6 +35,7 @@ class MacroKey:
             x=int(d.get("x", 0)),
             y=int(d.get("y", 0)),
             delay_after=float(d.get("delay_after", 0.02)),
+            use_position=bool(d.get("use_position", True)),
         )
 
 

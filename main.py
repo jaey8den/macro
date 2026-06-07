@@ -37,6 +37,7 @@ class App:
             on_new=self._open_new_editor,
             on_edit=self._open_edit_editor,
             on_delete=self._delete_macro,
+            on_quit=self.quit,
         )
 
         self._tray = TrayIcon(

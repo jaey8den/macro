@@ -58,7 +58,8 @@ class MacroPlayer:
         if mk.type == "click":
             btn = _parse_mouse_button(mk.button)
             if mk.action == "press":
-                self._mouse.position = (mk.x, mk.y)
+                if mk.use_position:
+                    self._mouse.position = (mk.x, mk.y)
                 self._mouse.press(btn)
                 self._held_buttons.append(btn)
             else:

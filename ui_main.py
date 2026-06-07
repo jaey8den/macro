@@ -13,16 +13,18 @@ class MainWindow:
         on_new: Callable,
         on_edit: Callable[[Macro], None],
         on_delete: Callable[[Macro], None],
+        on_quit: Callable | None = None,
     ):
         self._root = root
         self._macros_getter = macros_getter
         self._on_new = on_new
         self._on_edit = on_edit
         self._on_delete = on_delete
+        self._on_quit = on_quit
 
         self._root.title("Macro App")
         self._root.minsize(500, 300)
-        self._root.protocol("WM_DELETE_WINDOW", self.hide)
+        self._root.protocol("WM_DELETE_WINDOW", self._on_quit if self._on_quit else self.hide)
         self._root.bind("<Unmap>", self._on_unmap)
 
         self._build_ui()
