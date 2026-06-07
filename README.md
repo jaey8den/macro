@@ -13,19 +13,25 @@ A lightweight Windows desktop macro tool. Record keyboard and mouse sequences, b
 - **Multiple macros** — saved to a local `macros.json` file
 - **System tray** — runs quietly in the background; close the window to hide, right-click the tray icon to quit
 
-## Requirements
+## Download
+
+Pre-built releases are available on the [Releases](../../releases) page. Download the latest `MacroApp.rar`, extract it, and run `MacroApp.exe` — no Python required.
+
+## Running from source
+
+### Requirements
 
 - Windows 10/11
 - Python 3.11+
 
-## Setup
+### Setup
 
 ```bash
 python -m venv venv
 venv\Scripts\pip install -r requirements.txt
 ```
 
-## Running
+### Running
 
 ```bash
 # With a console window (useful for debugging)
@@ -36,6 +42,22 @@ venv\Scripts\pythonw.exe main.py
 ```
 
 To launch automatically at startup, create a shortcut to `pythonw.exe main.py` and place it in your Windows Startup folder (`Win+R` → `shell:startup`).
+
+## Building the executable
+
+```bash
+# One-time: generate icon.ico
+venv\Scripts\python make_icon.py
+
+# Build (re-run after any code change)
+venv\Scripts\pyinstaller macro.spec
+```
+
+Output is in `dist\MacroApp\`. To package for release:
+
+```powershell
+Compress-Archive -Force dist\MacroApp dist\MacroApp.zip
+```
 
 ## Usage
 
@@ -52,49 +74,52 @@ To launch automatically at startup, create a shortcut to `pythonw.exe main.py` a
 
 After recording, the sequence appears as a table of actions:
 
-| # | Action | Delay After (s) |
-|---|--------|----------------|
-| 1 | ↓ a | 0.0500 |
-| 2 | ↑ a | 0.0200 |
-| 3 | ↓ left-click (960, 540) | 0.1000 |
-| 4 | ↑ left-click (960, 540) | 0.0200 |
+| #   | Action                  | Delay After (s) |
+| --- | ----------------------- | --------------- |
+| 1   | ↓ a                     | 0.0500          |
+| 2   | ↑ a                     | 0.0200          |
+| 3   | ↓ left-click (960, 540) | 0.1000          |
+| 4   | ↑ left-click (960, 540) | 0.0200          |
 
 - **↓** = press (key/button down), **↑** = release (key/button up)
 - **Delete the ↑ row** to hold that key or button down for the remainder of the sequence
-- **Double-click** the *Delay After* cell to edit the timing
+- **Double-click** the _Delay After_ cell to edit the timing
 - Use **↑ / ↓ buttons** to reorder rows
 
 ### Trigger hotkeys
 
 Both keyboard combos and mouse buttons are supported:
 
-| Format | Example |
-|--------|---------|
-| Key combination | `<ctrl>+<shift>+m` |
-| Mouse middle button | `mouse:middle` |
-| Side button 1 (Back) | `mouse:x1` |
-| Side button 2 (Forward) | `mouse:x2` |
+| Format                  | Example            |
+| ----------------------- | ------------------ |
+| Key combination         | `<ctrl>+<shift>+m` |
+| Mouse middle button     | `mouse:middle`     |
+| Side button 1 (Back)    | `mouse:x1`         |
+| Side button 2 (Forward) | `mouse:x2`         |
 
 > **Note:** If the macro doesn't trigger in a specific app, try running Macro App as Administrator. Windows blocks simulated input from non-elevated processes targeting elevated windows.
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `main.py` | Entry point and app orchestration |
-| `models.py` | `Macro` and `MacroKey` data classes |
-| `store.py` | Load/save `macros.json` |
-| `recorder.py` | Keyboard and mouse recording |
-| `player.py` | Macro playback |
-| `hotkeys.py` | Global hotkey listener |
-| `tray.py` | System tray icon |
-| `ui_main.py` | Main window |
-| `ui_editor.py` | Macro editor dialog |
+| File           | Purpose                                                     |
+| -------------- | ----------------------------------------------------------- |
+| `main.py`      | Entry point and app orchestration                           |
+| `models.py`    | `Macro` and `MacroKey` data classes                         |
+| `store.py`     | Load/save `macros.json`                                     |
+| `recorder.py`  | Keyboard and mouse recording                                |
+| `player.py`    | Macro playback                                              |
+| `hotkeys.py`   | Global hotkey listener                                      |
+| `tray.py`      | System tray icon                                            |
+| `ui_main.py`   | Main window                                                 |
+| `ui_editor.py` | Macro editor dialog                                         |
+| `macro.spec`   | PyInstaller build spec                                      |
+| `make_icon.py` | Generates `icon.ico` for the exe (run once before building) |
 
 ## Dependencies
 
-| Package | Purpose |
-|---------|---------|
-| [pynput](https://github.com/moses-palmer/pynput) | Keyboard/mouse recording, playback, and global hotkeys |
-| [pystray](https://github.com/moses-palmer/pystray) | System tray icon |
-| [Pillow](https://python-pillow.org/) | Tray icon image rendering |
+| Package                                            | Purpose                                                |
+| -------------------------------------------------- | ------------------------------------------------------ |
+| [pynput](https://github.com/moses-palmer/pynput)   | Keyboard/mouse recording, playback, and global hotkeys |
+| [pystray](https://github.com/moses-palmer/pystray) | System tray icon                                       |
+| [Pillow](https://python-pillow.org/)               | Tray icon image rendering                              |
+| [PyInstaller](https://pyinstaller.org/)            | Packages the app into a standalone executable          |
