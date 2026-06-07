@@ -1,4 +1,5 @@
 import os
+import sys
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -14,7 +15,11 @@ from ui_main import MainWindow
 
 class App:
     def __init__(self):
-        os.chdir(Path(__file__).parent)
+        def _get_app_dir() -> Path:
+            if getattr(sys, "frozen", False):
+                return Path(sys.executable).parent
+            return Path(__file__).parent
+        os.chdir(_get_app_dir())
 
         self._root = tk.Tk()
         self._root.withdraw()
