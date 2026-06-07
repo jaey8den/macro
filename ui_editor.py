@@ -46,6 +46,8 @@ def _format_kb_hotkey(keys_held: set, last_key) -> str:
         parts.append(f"<{last_key.name}>")
     elif isinstance(last_key, pynput_keyboard.KeyCode) and last_key.char:
         parts.append(last_key.char)
+    elif isinstance(last_key, pynput_keyboard.KeyCode) and last_key.vk is not None:
+        parts.append(f"<{last_key.vk}>")
     else:
         return ""
 
